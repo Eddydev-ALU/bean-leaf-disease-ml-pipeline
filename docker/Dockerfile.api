@@ -1,0 +1,33 @@
+FROM python:3.11-slim
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    TF_CPP_MIN_LOG_LEVEL=3 \
+    MODEL_DIR=/app/models \
+    DATA_DIR=/app/data \
+    OMP_NUM_THREADS=2
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        libgl1 libglib2.0-0 curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Dependencies first — this layer caches, so code edits don't reinstall TensorFlow
+COPY requirements-api.txt .
+RUN pip install --no-cache-dir -r requirements-api.txt
+
+COPY src/ ./src/
+COPY app/api.py ./app/
+COPY models/ ./models/
+
+RUN mkdir -p /app/data/train /app/data/test
+
+EXPOSE 8000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+    CMD curl -fs http://localhost:8000/health || exit 1
+
+# 1 worker per container: we scale by adding CONTAINERS, which is what the
+# Locust experiment measures. Multiple workers per container would confound it.
+CMD ["uvicorn", "app.api:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]

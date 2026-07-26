@@ -1,0 +1,32 @@
+{
+  "train_class_counts": {
+    "angular_leaf_spot": 345,
+    "bean_rust": 348,
+    "healthy": 341
+  },
+  "rgb_means": {
+    "angular_leaf_spot": {
+      "R": 130.10000610351562,
+      "G": 136.1999969482422,
+      "B": 74.5
+    },
+    "bean_rust": {
+      "R": 120.5999984741211,
+      "G": 119.9000015258789,
+      "B": 80.30000305175781
+    },
+    "healthy": {
+      "R": 120.5999984741211,
+      "G": 144.8000030517578,
+      "B": 85.5
+    }
+  },
+  "pairwise_errors": {
+    "healthy_vs_angular": 4,
+    "healthy_vs_rust": 8,
+    "angular_vs_rust": 12
+  },
+  "total_misclassified": 24,
+  "n_test": 128,
+  "false_reassurance_rate": 0.13953488372093023
+}

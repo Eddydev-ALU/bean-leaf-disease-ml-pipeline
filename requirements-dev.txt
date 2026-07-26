@@ -1,0 +1,11 @@
+# For running the notebook locally (Colab already has most of this)
+tensorflow==2.16.1
+datasets==2.19.1
+huggingface_hub==0.23.0
+pandas==2.2.2
+pyarrow==16.1.0
+matplotlib==3.9.0
+seaborn==0.13.2
+scikit-learn==1.5.0
+jupyter==1.0.0
+locust==2.29.0
