@@ -20,6 +20,7 @@ from typing import List, Optional
 
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.concurrency import run_in_threadpool
 from pydantic import BaseModel
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -123,7 +124,7 @@ async def predict_endpoint(file: UploadFile = File(...)):
     raw = await file.read()
     t0 = time.time()
     try:
-        result = predict(raw)
+        result = await run_in_threadpool(predict, raw)
     except FileNotFoundError as exc:
         raise HTTPException(503, str(exc))
     except Exception as exc:  # noqa: BLE001

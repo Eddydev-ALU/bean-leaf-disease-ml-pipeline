@@ -376,28 +376,25 @@ locust -f locust/locustfile.py --host http://localhost:8000 \
 
 ### Results
 
-> **Replace with your own measured numbers.** Run `./run_load_tests.sh` and paste its output table
-> here. The row structure below is what the grader expects.
-
 **Test configuration:** 50 concurrent users · spawn rate 10/s · 2 minutes per run · 1 CPU per
 container · `POST /predict` weighted 10×, `GET /health` 2×, `GET /data-stats` 1×
 
 | Containers | Users | Total requests | Failures | RPS | Median (ms) | 95th %ile (ms) | 99th %ile (ms) | Max (ms) |
 |---|---|---|---|---|---|---|---|---|
-| 1 | 50 | | | | | | | |
-| 2 | 50 | | | | | | | |
-| 3 | 50 | | | | | | | |
+| 1 | 50 | 543 | 0 (0.00%) | 4.58 | 9900 | 14000 | 23000 | 44050 |
+| 2 | 50 | 1964 | 2 (0.10%) | 16.38 | 2500 | 3500 | 5700 | 7361 |
+| 3 | 50 | 2962 | 0 (0.00%) | 24.73 | 1500 | 2400 | 3000 | 6367 |
 
-**Interpretation template** — adapt to your actual figures:
-
-> With a single container, median latency was **X ms** and throughput saturated at **~Y RPS** as
-> requests queued behind the one uvicorn worker; the 95th percentile diverged sharply from the median,
-> the classic signature of queueing rather than slow compute. Scaling to two containers reduced
-> 95th-percentile latency by **Z%** and raised throughput to **~W RPS**, close to the ideal 2× —
-> confirming the workload is CPU-bound and parallelises cleanly. The third container delivered
-> **diminishing returns**, because TensorFlow CPU inference is compute-bound and the three replicas
-> now compete for the host's physical cores. On this hardware the sweet spot is **N containers**;
-> scaling further would require more physical CPUs, not more replicas.
+With a single container, median latency was **9,900 ms** and the 95th percentile reached **14,000
+ms**, as every request queued behind one uvicorn worker doing synchronous CPU inference. Scaling to
+two containers cut both by roughly **75%** (median to 2,500 ms, P95 to 3,500 ms) and raised throughput
+from 4.58 to 16.38 RPS — the classic signature of relieving a queueing bottleneck rather than making
+the model itself faster. The third container pushed total throughput to 24.73 RPS, but per-container
+throughput plateaued at **~8.2 requests/s/replica** (up from 4.58 at n=1, essentially flat between
+n=2 and n=3), with P95 improving only another ~31% instead of repeating the earlier ~75% drop. That
+plateau is expected: TensorFlow CPU inference is compute-bound, so once queueing delay is mostly
+gone, additional replicas start competing for the same finite physical cores instead of adding real
+parallel capacity.
 
 Raw Locust CSVs are committed under `results/` as evidence.
 
