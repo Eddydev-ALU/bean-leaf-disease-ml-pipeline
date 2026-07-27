@@ -15,8 +15,8 @@ Makerere AI Lab in collaboration with NaCRRI.
 | Item | Link |
 |---|---|
 | **Video demo (camera on)** | `<PASTE YOUR YOUTUBE LINK>` |
-| **Live UI** | `<PASTE YOUR DEPLOYED STREAMLIT URL>` |
-| **Live API docs (Swagger)** | `<PASTE YOUR API URL>/docs` |
+| **Live UI** | [bean-leaf-disease-ui.onrender.com](https://bean-leaf-disease-ui.onrender.com/) |
+| **Live API docs (Swagger)** | [bean-leaf-disease-api.onrender.com/docs](https://bean-leaf-disease-api.onrender.com/docs) |
 | **Training notebook** | [`notebook/bean_disease_classification.ipynb`](notebook/bean_disease_classification.ipynb) |
 | **Model file** | [`models/beans_model.keras`](models/) (also exported as `.h5`) |
 
@@ -24,10 +24,13 @@ Makerere AI Lab in collaboration with NaCRRI.
 
 ## Project description
 
-Common bean is a staple protein crop for smallholder farmers across East Africa. Angular Leaf Spot
-and Bean Rust are two of its most damaging diseases, and both are diagnosable from a single leaf
-photograph — but only if an agronomist is available. This project puts that diagnosis in a phone
-browser: a farmer uploads a leaf photo and receives a classification in under 100 ms.
+Common bean is a staple protein crop for smallholder farmers across East Africa — nowhere more than
+Rwanda, which has the **highest bean consumption per capita of any country in the world** at 30.8 kg
+per person per year, ahead of El Salvador and Tanzania
+([Helgi Library, bean consumption per capita](https://www.helgilibrary.com/indicators/bean-consumption-per-capita/)).
+Angular Leaf Spot and Bean Rust are two of its most damaging diseases, and both are diagnosable from a
+single leaf photograph — but only if an agronomist is available. This project puts that diagnosis in a
+phone browser: a farmer uploads a leaf photo and receives a classification in under 100 ms.
 
 The system implements the complete ML lifecycle:
 
@@ -139,8 +142,8 @@ bean-leaf-disease/
 │   └── sample_images/
 │
 ├── data/
-│   ├── train/                   # <class>/*.jpg  (gitignored, created by prepare_data.py)
-│   └── test/
+│   ├── train/                   # <class>/*.jpg  (committed — baked into the API image for Render)
+│   └── test/                    # new uploads (upload_*.jpg) stay gitignored
 │
 └── models/
     ├── beans_model.keras        # production model
@@ -402,48 +405,41 @@ Raw Locust CSVs are committed under `results/` as evidence.
 
 ## Deployment
 
-### Option A — Render (fastest to a public URL)
+Deployed on [Render](https://render.com) as two separate Docker-based Web Services built from this
+repo — `bean-api` and `bean-ui`.
 
-1. Push the repo to GitHub (ensure `models/beans_model.keras` is committed — it's only a few MB).
-2. On [render.com](https://render.com): **New → Web Service** → connect your repo.
-   - Runtime **Docker**, Dockerfile path `docker/Dockerfile.api`, port `8000`
-   - Instance type: **Standard** or above (the free tier's 512 MB will OOM on TensorFlow)
-3. Deploy, then copy the resulting public URL.
-4. **New → Web Service** again for the UI:
-   - Dockerfile path `docker/Dockerfile.ui`, port `8501`
-   - Environment variable `API_URL` = the API service's public URL from step 3
-5. Paste both URLs into the Links table at the top of this README.
+### Steps
 
-> **Limitation to acknowledge on camera:** Render's ephemeral filesystem means uploaded images and
-> retrained models are lost when the container restarts. Fine for a demo — but state it explicitly,
-> and use Option B if you want to demonstrate retraining persistence properly.
+1. Push to GitHub. The model (`models/beans_model.keras`, ~24 MB) and the full training/test dataset
+   (`data/train`, `data/test`, ~67 MB) are both committed directly — no Git LFS needed — so the API
+   image is self-contained and doesn't depend on any bind-mounted volume at runtime.
+2. **API service** (`bean-api`):
+   - **New +** → **Web Service** → connect the repo
+   - Runtime: **Docker**, Dockerfile Path: `docker/Dockerfile.api`
+   - Instance Type: **Free**
+   - After the first deploy, go to **Settings → Health Checks** and set the Health Check Path to
+     `/health`
+   - No environment variables are required — `MODEL_DIR`/`DATA_DIR` are baked into the image, and
+     Render injects `PORT` automatically (both Dockerfiles bind to `${PORT}` with a local fallback,
+     rather than a hardcoded port, since Render's `EXPOSE`-based port auto-detection isn't guaranteed)
+3. **UI service** (`bean-ui`):
+   - Same repo, Dockerfile Path: `docker/Dockerfile.ui`, Instance Type: **Free**
+   - Health Check Path: `/_stcore/health`
+   - Environment variable: `API_URL` = the API service's public URL from step 2
+4. Paste both resulting URLs into the Links table at the top of this README.
 
-### Option B — AWS EC2 / Lightsail (persistent, closest to production)
+### Known limitations of Render's Free tier — acknowledge these on camera
 
-```bash
-# Launch Ubuntu 22.04, t3.medium or larger (TensorFlow needs >= 4 GB RAM).
-# Security group: open TCP 8000 and 8501.
-
-ssh ubuntu@<your-instance-ip>
-
-sudo apt update
-sudo apt install -y docker.io docker-compose-plugin git python3-pip
-sudo usermod -aG docker $USER && newgrp docker
-
-git clone https://github.com/<you>/bean-leaf-disease.git
-cd bean-leaf-disease
-
-pip3 install pandas pyarrow pillow huggingface_hub
-python3 prepare_data.py
-
-docker compose up -d --scale api=2
-
-# UI:  http://<your-instance-ip>:8501
-# API: http://<your-instance-ip>:8000/docs
-```
-
-Because `./data` and `./models` are bind-mounted to the host, uploads and retrained model versions
-survive restarts — which lets you demonstrate the full retraining cycle convincingly.
+- **512 MB RAM** is tight for TensorFlow; the API can be OOM-killed under sustained load. A paid
+  **Standard** plan (2 GB) removes this risk entirely if budget allows — Free was used here deliberately
+  to keep the deployment cost-free for the demo.
+- **Cold starts** — a Free instance spins down after ~15 minutes idle and takes 30–60s to wake on the
+  next request. Hit `/health` a minute before recording to warm it up.
+- **Ephemeral filesystem** — the baseline dataset ships baked into the image, so the hosted UI shows
+  real training counts and retraining has real data to start from, but anything **uploaded after
+  deploy** (new images, a freshly retrained model) is lost on the next restart or redeploy. Demonstrate
+  the full persistent upload → retrain cycle on the local Docker Compose stack instead, where `./data`
+  and `./models` are bind-mounted to the host.
 
 ### Evaluating the model in production
 
