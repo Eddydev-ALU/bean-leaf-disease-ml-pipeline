@@ -49,7 +49,10 @@ st.sidebar.caption("Makerere iBean dataset · MobileNetV2")
 health = api_get("/health")
 if health:
     ok = health["status"] == "healthy"
-    st.sidebar.success("● API healthy") if ok else st.sidebar.warning("● API degraded")
+    if ok:
+        st.sidebar.success("● API healthy")
+    else:
+        st.sidebar.warning("● API degraded")
     st.sidebar.metric("Up-time", health["uptime_human"])
     st.sidebar.write(f"**Model loaded:** {'✅' if health['model_loaded'] else '❌'}")
     st.sidebar.write(f"**Container:** `{health['container_id']}`")
@@ -75,7 +78,7 @@ if page == "Predict":
     if file:
         col1, col2 = st.columns([1, 1])
         with col1:
-            st.image(Image.open(file), caption=file.name, use_container_width=True)
+            st.image(Image.open(file), caption=file.name, use_column_width=True)
 
         with col2:
             if st.button("🔍 Classify", type="primary", use_container_width=True):

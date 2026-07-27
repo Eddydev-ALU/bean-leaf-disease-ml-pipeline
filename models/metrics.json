@@ -1,18 +1,18 @@
 {
-  "accuracy": 0.8125,
-  "precision_macro": 0.8175010175010176,
-  "recall_macro": 0.813953488372093,
-  "f1_macro": 0.8078225974567438,
-  "roc_auc_macro_ovr": 0.9587442729029596,
+  "accuracy": 0.828125,
+  "precision_macro": 0.8533860342555996,
+  "recall_macro": 0.8294573643410853,
+  "f1_macro": 0.8122843340234644,
+  "roc_auc_macro_ovr": 0.9652270210409745,
   "confusion_matrix": [
     [
-      33,
-      6,
-      4
+      42,
+      1,
+      0
     ],
     [
-      6,
-      29,
+      13,
+      22,
       8
     ],
     [
@@ -23,38 +23,36 @@
   ],
   "per_class": {
     "angular_leaf_spot": {
-      "precision": 0.8461538461538461,
-      "recall": 0.7674418604651163,
-      "f1-score": 0.8048780487804879,
+      "precision": 0.7636363636363637,
+      "recall": 0.9767441860465116,
+      "f1-score": 0.8571428571428571,
       "support": 43.0
     },
     "bean_rust": {
-      "precision": 0.8285714285714286,
-      "recall": 0.6744186046511628,
-      "f1-score": 0.7435897435897436,
+      "precision": 0.9565217391304348,
+      "recall": 0.5116279069767442,
+      "f1-score": 0.6666666666666666,
       "support": 43.0
     },
     "healthy": {
-      "precision": 0.7777777777777778,
+      "precision": 0.84,
       "recall": 1.0,
-      "f1-score": 0.875,
+      "f1-score": 0.9130434782608695,
       "support": 42.0
     },
-    "accuracy": 0.8125,
+    "accuracy": 0.828125,
     "macro avg": {
-      "precision": 0.8175010175010176,
-      "recall": 0.813953488372093,
-      "f1-score": 0.8078225974567438,
+      "precision": 0.8533860342555996,
+      "recall": 0.8294573643410853,
+      "f1-score": 0.8122843340234644,
       "support": 128.0
     },
     "weighted avg": {
-      "precision": 0.8178113553113553,
-      "recall": 0.8125,
-      "f1-score": 0.8072977739993746,
+      "precision": 0.8534906126482213,
+      "recall": 0.828125,
+      "f1-score": 0.8114971532091096,
       "support": 128.0
     }
   },
-  "n_test": 128,
-  "evaluated_at": 1785072963.2481272,
-  "model_version": "baseline"
+  "evaluated_at": 1785144551.4684002
 }
