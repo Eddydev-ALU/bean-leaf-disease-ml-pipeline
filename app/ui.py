@@ -24,6 +24,12 @@ API_URL = os.getenv("API_URL", "http://localhost:8000")
 
 st.set_page_config(page_title="Bean Leaf Disease Classifier", page_icon="🌱", layout="wide")
 
+# Hide Streamlit's decorative rainbow header bar — purely cosmetic, not functional chrome.
+st.markdown(
+    "<style>[data-testid='stDecoration'] { display: none; }</style>",
+    unsafe_allow_html=True,
+)
+
 CLASS_NAMES = ["angular_leaf_spot", "bean_rust", "healthy"]
 PRETTY = {
     "angular_leaf_spot": "Angular Leaf Spot",
