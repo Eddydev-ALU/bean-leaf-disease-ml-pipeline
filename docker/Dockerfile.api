@@ -30,4 +30,6 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
 
 # 1 worker per container: we scale by adding CONTAINERS, which is what the
 # Locust experiment measures. Multiple workers per container would confound it.
-CMD ["uvicorn", "app.api:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
+# Shell form (not exec form) so $PORT expands — Render injects PORT and expects
+# the container to bind to it; falls back to 8000 for local docker-compose.
+CMD uvicorn app.api:app --host 0.0.0.0 --port ${PORT:-8000} --workers 1
