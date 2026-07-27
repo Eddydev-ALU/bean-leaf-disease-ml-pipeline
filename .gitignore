@@ -1,9 +1,7 @@
-data/train/*
-data/test/*
 data/new_uploads/
 data/uploads/
-!data/train/.gitkeep
-!data/test/.gitkeep
+data/train/*/upload_*
+data/test/*/upload_*
 
 
 models/*

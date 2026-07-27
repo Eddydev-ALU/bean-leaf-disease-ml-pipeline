@@ -20,6 +20,7 @@ RUN pip install --no-cache-dir -r requirements-api.txt
 COPY src/ ./src/
 COPY app/api.py ./app/
 COPY models/ ./models/
+COPY data/ ./data/
 
 RUN mkdir -p /app/data/train /app/data/test
 
