@@ -14,7 +14,7 @@ Makerere AI Lab in collaboration with NaCRRI.
 
 | Item | Link |
 |---|---|
-| **Video demo** | `https://youtu.be/wetNIEw9FKg` |
+| **Video demo** | [Bean-Leaf-ML-Pipeline-Demo-Video](https://youtu.be/wetNIEw9FKg) |
 | **Live UI** | [bean-leaf-disease-ui.onrender.com](https://bean-leaf-disease-ui.onrender.com/) |
 | **Live API docs (Swagger)** | [bean-leaf-disease-api.onrender.com/docs](https://bean-leaf-disease-api.onrender.com/docs) |
 | **Training notebook** | [`notebook/bean_disease_classification.ipynb`](notebook/bean_disease_classification.ipynb) |
