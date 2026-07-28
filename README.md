@@ -14,7 +14,7 @@ Makerere AI Lab in collaboration with NaCRRI.
 
 | Item | Link |
 |---|---|
-| **Video demo (camera on)** | `<PASTE YOUR YOUTUBE LINK>` |
+| **Video demo** | `https://youtu.be/wetNIEw9FKg` |
 | **Live UI** | [bean-leaf-disease-ui.onrender.com](https://bean-leaf-disease-ui.onrender.com/) |
 | **Live API docs (Swagger)** | [bean-leaf-disease-api.onrender.com/docs](https://bean-leaf-disease-api.onrender.com/docs) |
 | **Training notebook** | [`notebook/bean_disease_classification.ipynb`](notebook/bean_disease_classification.ipynb) |
@@ -456,24 +456,6 @@ production" asks for:
 
 ---
 
-## Video demo checklist
-
-Record with your **camera on**, and cover these in order:
-
-1. **Intro** (~30s) — who you are, the problem, the dataset, why it matters for East African farmers.
-2. **Prediction** — upload a leaf image whose true class you know; show the **correct** prediction with
-   confidence and the probability bar chart. Do one from each class if time allows.
-3. **Data insights** — walk through all three feature visualisations and state the story each tells,
-   especially the Angular ↔ Rust confusion finding and the 10.5% false-reassurance rate.
-4. **Model performance** — show the live `/metrics` page: 5 metrics, confusion matrix, per-class table.
-5. **Bulk upload** — upload a zip or multiple images; show the counter rise and the retrain trigger fire.
-6. **Retraining** — press **Trigger Retraining**; show the job running, then the new validation accuracy
-   and updated metrics. Point out that it loads your own model as the pretrained base.
-7. **Uptime** — point at the sidebar uptime and container ID.
-8. **Load test** — run Locust with the web UI visible, then `docker compose up -d --scale api=3` and
-   re-run; show latency improving and mention the `served_by` field changing between containers.
-
----
 
 ## Citation
 
