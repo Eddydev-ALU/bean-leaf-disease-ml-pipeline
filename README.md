@@ -114,8 +114,8 @@ prioritise close-up, well-lit images of these two classes, not more healthy leav
 ```
 bean-leaf-disease/
 ├── README.md
-├── prepare_data.py              # downloads iBean -> data/train, data/test, locust samples
-├── run_load_tests.sh            # automated 1/2/3-container Locust benchmark
+├── prepare_data.py              
+├── run_load_tests.sh            
 ├── docker-compose.yml
 ├── requirements-api.txt / -ui.txt / -dev.txt
 │
@@ -123,33 +123,33 @@ bean-leaf-disease/
 │   └── bean_disease_classification.ipynb
 │
 ├── src/
-│   ├── preprocessing.py         # decoding, augmentation, dataset builders, upload handling
-│   ├── model.py                 # build / train / evaluate / retrain + trigger logic
-│   └── prediction.py            # single-datapoint inference
+│   ├── preprocessing.py         
+│   ├── model.py                 
+│   └── prediction.py            
 │
 ├── app/
-│   ├── api.py                   # FastAPI service
-│   └── ui.py                    # Streamlit front-end
+│   ├── api.py                   
+│   └── ui.py                    
 │
 ├── docker/
 │   ├── Dockerfile.api
 │   ├── Dockerfile.ui
-│   └── nginx.conf               # least_conn load balancer across API replicas
+│   └── nginx.conf               
 │
 ├── locust/
 │   ├── locustfile.py
 │   └── sample_images/
 │
 ├── data/
-│   ├── train/                   # <class>/*.jpg  (committed — baked into the API image for Render)
-│   └── test/                    # new uploads (upload_*.jpg) stay gitignored
+│   ├── train/                   
+│   └── test/                    
 │
 └── models/
-    ├── beans_model.keras        # production model
-    ├── beans_model.h5           # legacy format
+    ├── beans_model.keras        
+    ├── beans_model.h5           
     ├── class_names.json
-    ├── metrics.json             # exported by the notebook -> served at GET /metrics
-    └── insights.json            # exported by the notebook -> served at GET /insights
+    ├── metrics.json             
+    └── insights.json            
 ```
 
 ---
