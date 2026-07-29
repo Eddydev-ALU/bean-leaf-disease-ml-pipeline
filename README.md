@@ -4,7 +4,7 @@ Classifies bean leaf images into **Angular Leaf Spot**, **Bean Rust**, or **Heal
 MobileNetV2 transfer-learning model, served through a FastAPI + Streamlit stack, containerised with
 Docker, load-balanced with nginx, and load-tested with Locust.
 
-**Dataset:** [AI-Lab-Makerere/beans (iBean)](https://huggingface.co/datasets/AI-Lab-Makerere/beans) —
+**Dataset:** [AI-Lab-Makerere/beans (iBean)](https://huggingface.co/datasets/AI-Lab-Makerere/beans), 
 1,295 smartphone photographs of bean leaves collected in the field across districts of Uganda by the
 Makerere AI Lab in collaboration with NaCRRI.
 
@@ -24,25 +24,24 @@ Makerere AI Lab in collaboration with NaCRRI.
 
 ## Project description
 
-Common bean is a staple protein crop for smallholder farmers across East Africa — nowhere more than
-Rwanda, which has the **highest bean consumption per capita of any country in the world** at 30.8 kg
+Common bean is a staple protein crop for smallholder farmers across East Africa, nowhere more than Rwanda, which has the **highest bean consumption per capita of any country in the world** at 30.8 kg
 per person per year, ahead of El Salvador and Tanzania
 ([Helgi Library, bean consumption per capita](https://www.helgilibrary.com/indicators/bean-consumption-per-capita/)).
 Angular Leaf Spot and Bean Rust are two of its most damaging diseases, and both are diagnosable from a
-single leaf photograph — but only if an agronomist is available. This project puts that diagnosis in a
+single leaf photograph, but only if an agronomist is available. This project puts that diagnosis in a
 phone browser: a farmer uploads a leaf photo and receives a classification in under 100 ms.
 
 The system implements the complete ML lifecycle:
 
 | Stage | Implementation |
 |---|---|
-| **Data acquisition** | iBean pulled directly from the Hugging Face Hub via `pandas.read_parquet` — reproducible, no manual downloads |
+| **Data acquisition** | iBean pulled directly from the Hugging Face Hub via `pandas.read_parquet`, reproducible, no manual downloads |
 | **Data processing** | Decode parquet bytes → RGB → resize 224×224 → augment (flip / rotate / zoom / contrast) → MobileNetV2 preprocessing |
 | **Model creation** | MobileNetV2 backbone (ImageNet), two-stage training: frozen-backbone head training, then partial fine-tuning |
 | **Model testing** | 5 metrics + per-class report + confusion matrix + error analysis + threshold calibration on a held-out 128-image test split |
 | **Retraining** | Users bulk-upload labelled images; a threshold trigger fires; the **existing custom model** is loaded and fine-tuned further; old versions are timestamped and kept |
 | **API** | FastAPI, 8 endpoints, auto-generated Swagger docs |
-| **UI** | Streamlit — uptime monitor, live data insights, prediction, bulk upload, retrain button |
+| **UI** | Streamlit, uptime monitor, live data insights, prediction, bulk upload, retrain button |
 | **Scaling** | Docker Compose + nginx `least_conn` load balancing across N API replicas |
 | **Monitoring** | `/health` uptime + `/metrics` production evaluation, both surfaced in the UI |
 
@@ -70,12 +69,12 @@ Per class:
 
 ### Optimization techniques used
 
-- **Pretrained model** — MobileNetV2 with ImageNet weights as the backbone
-- **Regularization** — Dropout (0.3, two layers), L2 weight decay (1e-4) on the dense head, plus data augmentation (horizontal flip, ±15% rotation, ±15% zoom, ±10% contrast)
-- **Optimizer** — Adam, `1e-3` for head training, `3e-5` for fine-tuning
-- **Early stopping** — on `val_accuracy` with `restore_best_weights=True`
-- **LR scheduling** — `ReduceLROnPlateau`, factor 0.3
-- **Hyperparameter search** — three fine-tuning configurations tested and compared
+- **Pretrained model**: MobileNetV2 with ImageNet weights as the backbone
+- **Regularization**: Dropout (0.3, two layers), L2 weight decay (1e-4) on the dense head, plus data augmentation (horizontal flip, ±15% rotation, ±15% zoom, ±10% contrast)
+- **Optimizer**: Adam, `1e-3` for head training, `3e-5` for fine-tuning
+- **Early stopping**: on `val_accuracy` with `restore_best_weights=True`
+- **LR scheduling**: `ReduceLROnPlateau`, factor 0.3
+- **Hyperparameter search**: three fine-tuning configurations tested and compared
 
 ### What the numbers actually say
 
@@ -89,7 +88,7 @@ Three fine-tuning configurations were evaluated:
 
 **ROC-AUC stayed within 0.9555–0.9627 across every configuration**, including the one that lost 9
 percentage points of accuracy. The learned representation is stable and strong; only the argmax
-decision boundary moves. Features fine, calibration fragile — that distinction drove the decision to
+decision boundary moves. Features fine, calibration fragile, that distinction drove the decision to
 apply threshold calibration rather than simply train longer.
 
 The validation sanity check also showed fine-tuning *reducing* validation accuracy (0.8120 → 0.7970),
@@ -98,12 +97,12 @@ backbone layers overfits. This is documented honestly in the notebook rather tha
 
 ### The error that matters operationally
 
-`healthy` recall is **1.00 across all three configurations** — the model never misses a healthy leaf.
+`healthy` recall is **1.00 across all three configurations**, the model never misses a healthy leaf.
 But `healthy` precision is only 0.82, meaning **9 of 86 diseased leaves (10.5%) are classified as
 healthy**. In the field that is false reassurance: telling a farmer an infected plant is fine. A false
 alarm costs one inspection; a missed infection can cost a harvest.
 
-Of 22 total test errors, **13 come from the Angular ↔ Rust boundary** — more than the other two class
+Of 22 total test errors, **13 come from the Angular ↔ Rust boundary**, more than the other two class
 pairs combined. Both diseases produce brown-ish spotting and differ mainly in lesion *shape* (angular
 and vein-bounded vs small round pustules). **Actionable conclusion:** further data collection should
 prioritise close-up, well-lit images of these two classes, not more healthy leaves.
@@ -246,7 +245,7 @@ docker compose ps             # all three services should read healthy
 ```
 
 Each API container runs exactly **one** uvicorn worker and is limited to **1 CPU**, so the number of
-containers is the only variable in the load test — this keeps the benchmark honest.
+containers is the only variable in the load test, this keeps the benchmark honest.
 
 ### Scale horizontally
 
@@ -256,7 +255,7 @@ docker compose ps
 ```
 
 nginx picks up new replicas automatically via Docker's embedded DNS (`resolve` + 10s TTL). Every
-`/predict` response includes a `served_by` field showing which container handled it — useful for
+`/predict` response includes a `served_by` field showing which container handled it, useful for
 proving load balancing on camera.
 
 ### Useful commands
@@ -284,7 +283,7 @@ docker compose down -v            # stop and remove volumes
 | `POST` | `/retrain` | Fires background retraining; returns immediately |
 | `GET` | `/retrain/status` | Live progress / result of the retraining job |
 
-### Example — prediction
+### Example: prediction
 
 ```bash
 curl -X POST http://localhost:8000/predict \
@@ -306,7 +305,7 @@ curl -X POST http://localhost:8000/predict \
 }
 ```
 
-### Example — bulk upload then retrain
+### Example: bulk upload then retrain
 
 ```bash
 # Upload a zip laid out as angular_leaf_spot/ bean_rust/ healthy/
@@ -325,25 +324,25 @@ curl http://localhost:8000/retrain/status
 
 ## Retraining pipeline
 
-1. **Upload** — the UI's *Upload & Retrain* page accepts either multiple images with a chosen class
+1. **Upload**: the UI's *Upload & Retrain* page accepts either multiple images with a chosen class
    label, or a `.zip` whose top-level folders are class names.
-2. **Save** — `src/preprocessing.py:save_uploaded_image()` writes each file to
+2. **Save**: `src/preprocessing.py:save_uploaded_image()` writes each file to
    `data/train/<class>/upload_NNNNN.jpg`. Because `./data` is bind-mounted, uploads survive container
    restarts.
-3. **Preprocess** — `load_dataset_from_dir()` rebuilds the `tf.data` pipeline over the combined
+3. **Preprocess**: `load_dataset_from_dir()` rebuilds the `tf.data` pipeline over the combined
    original + uploaded images, applying the identical resize → augment → MobileNetV2 preprocessing
    chain used in training.
-4. **Trigger** — `should_retrain()` fires when ≥ `RETRAIN_THRESHOLD` (default 20) new images have
+4. **Trigger**: `should_retrain()` fires when ≥ `RETRAIN_THRESHOLD` (default 20) new images have
    accumulated, or when tracked accuracy falls below `ACC_FLOOR` (default 0.80). The UI also exposes a
    *force* override.
-5. **Retrain** — `src/model.py:retrain()` loads `models/beans_model.keras` — **our own trained model,
-   used as the pretrained starting point** — and fine-tunes it at `1e-5` with early stopping on
+5. **Retrain**: `src/model.py:retrain()` loads `models/beans_model.keras`, **our own trained model,
+   used as the pretrained starting point**, and fine-tunes it at `1e-5` with early stopping on
    `val_accuracy`.
-6. **Version** — the previous model is renamed `beans_model_<timestamp>.keras` before the new one is
+6. **Version**: the previous model is renamed `beans_model_<timestamp>.keras` before the new one is
    written, so you can always roll back.
-7. **Hot reload** — `src/prediction.py:reload_model()` clears the cached model so the API serves the
+7. **Hot reload**: `src/prediction.py:reload_model()` clears the cached model so the API serves the
    new weights immediately, with no restart.
-8. **Re-evaluate** — the fresh model is scored against the untouched test split and `metrics.json` is
+8. **Re-evaluate**: the fresh model is scored against the untouched test split and `metrics.json` is
    rewritten, so the UI's Performance page reflects the retrained model.
 
 ---
@@ -391,7 +390,7 @@ container · `POST /predict` weighted 10×, `GET /health` 2×, `GET /data-stats`
 With a single container, median latency was **9,900 ms** and the 95th percentile reached **14,000
 ms**, as every request queued behind one uvicorn worker doing synchronous CPU inference. Scaling to
 two containers cut both by roughly **75%** (median to 2,500 ms, P95 to 3,500 ms) and raised throughput
-from 4.58 to 16.38 RPS — the classic signature of relieving a queueing bottleneck rather than making
+from 4.58 to 16.38 RPS, the classic signature of relieving a queueing bottleneck rather than making
 the model itself faster. The third container pushed total throughput to 24.73 RPS, but per-container
 throughput plateaued at **~8.2 requests/s/replica** (up from 4.58 at n=1, essentially flat between
 n=2 and n=3), with P95 improving only another ~31% instead of repeating the earlier ~75% drop. That
@@ -406,12 +405,12 @@ Raw Locust CSVs are committed under `results/` as evidence.
 ## Deployment
 
 Deployed on [Render](https://render.com) as two separate Docker-based Web Services built from this
-repo — `bean-api` and `bean-ui`.
+repo, `bean-api` and `bean-ui`.
 
 ### Steps
 
 1. Push to GitHub. The model (`models/beans_model.keras`, ~24 MB) and the full training/test dataset
-   (`data/train`, `data/test`, ~67 MB) are both committed directly — no Git LFS needed — so the API
+   (`data/train`, `data/test`, ~67 MB) are both committed directly, no Git LFS needed, so the API
    image is self-contained and doesn't depend on any bind-mounted volume at runtime.
 2. **API service** (`bean-api`):
    - **New +** → **Web Service** → connect the repo
@@ -419,7 +418,7 @@ repo — `bean-api` and `bean-ui`.
    - Instance Type: **Free**
    - After the first deploy, go to **Settings → Health Checks** and set the Health Check Path to
      `/health`
-   - No environment variables are required — `MODEL_DIR`/`DATA_DIR` are baked into the image, and
+   - No environment variables are required, `MODEL_DIR`/`DATA_DIR` are baked into the image, and
      Render injects `PORT` automatically (both Dockerfiles bind to `${PORT}` with a local fallback,
      rather than a hardcoded port, since Render's `EXPOSE`-based port auto-detection isn't guaranteed)
 3. **UI service** (`bean-ui`):
@@ -428,14 +427,14 @@ repo — `bean-api` and `bean-ui`.
    - Environment variable: `API_URL` = the API service's public URL from step 2
 4. Paste both resulting URLs into the Links table at the top of this README.
 
-### Known limitations of Render's Free tier — acknowledge these on camera
+### Known limitations of Render's Free tier, acknowledge these on camera
 
 - **512 MB RAM** is tight for TensorFlow; the API can be OOM-killed under sustained load. A paid
-  **Standard** plan (2 GB) removes this risk entirely if budget allows — Free was used here deliberately
+  **Standard** plan (2 GB) removes this risk entirely if budget allows, Free was used here deliberately
   to keep the deployment cost-free for the demo.
-- **Cold starts** — a Free instance spins down after ~15 minutes idle and takes 30–60s to wake on the
+- **Cold starts**: a Free instance spins down after ~15 minutes idle and takes 30–60s to wake on the
   next request. Hit `/health` a minute before recording to warm it up.
-- **Ephemeral filesystem** — the baseline dataset ships baked into the image, so the hosted UI shows
+- **Ephemeral filesystem**: the baseline dataset ships baked into the image, so the hosted UI shows
   real training counts and retraining has real data to start from, but anything **uploaded after
   deploy** (new images, a freshly retrained model) is lost on the next restart or redeploy. Demonstrate
   the full persistent upload → retrain cycle on the local Docker Compose stack instead, where `./data`
@@ -447,7 +446,7 @@ The deployed system evaluates itself, which is what "demonstrate the evaluation 
 production" asks for:
 
 - `GET /metrics` serves the current model's accuracy, precision, recall, F1, ROC-AUC and confusion
-  matrix — rendered on the UI's **Model Performance** page.
+  matrix, rendered on the UI's **Model Performance** page.
 - After every retrain, `src/model.py:retrain()` re-scores the new model against the untouched test
   split and rewrites `metrics.json`, so the dashboard always reflects the model actually being served.
 - `GET /health` reports uptime and model-load status; the UI sidebar polls it continuously.
