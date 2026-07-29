@@ -1,4 +1,4 @@
-# Bean Leaf Disease Classification — End-to-End ML Pipeline
+# Bean Leaf Disease Classification, End-to-End ML Pipeline
 
 Classifies bean leaf images into **Angular Leaf Spot**, **Bean Rust**, or **Healthy** using a
 MobileNetV2 transfer-learning model, served through a FastAPI + Streamlit stack, containerised with
